@@ -9,28 +9,20 @@ window.onload = function() {
   var signpost = document.getElementById("sign");
   var rainbow = document.getElementById("rainbow");
 
+  let image_attributes =
+  {
+    "person": 
+    {
+      "f4": ["upright", "facing_forward", "arms_raised", "brown_hair"],
+      "f1": []
+    }
+
+  }
+
   ctx.drawImage(girl, 10, 50, 200, 250);
   ctx.drawImage(angry_emote, 75, 25, 75, 75);
   ctx.drawImage(signpost, 250, 150, 100, 100);
   ctx.drawImage(rainbow, 265, 155, 50, 50);
 
-  // ----
-  //
-  //
-
-
-  let pride_panel1 =
-    { "person" : {
-        "pose" : ["upright", "facing_forward", "arms_raised"],
-        "left_of": ["arrow_sign"],
-        "saying": "I can't wait to go to LGBT+ Pride"
-      },
-      "arrow_sign": {
-        "pointing": ["right"],
-        "contains": ["rainbow_flag"],
-      }
-    }
-
-  console.log(JSON.stringify(pride_panel1));
-  
+   
 };
