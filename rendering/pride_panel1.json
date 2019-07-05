@@ -1,0 +1,11 @@
+{
+  "Pinky" : {
+    "pose" : ["upright", "facing_forward", "arms_raised"],
+    "left_of": ["arrow_sign"],
+    "saying": "I can't wait to go to LGBT+ Pride"
+  },
+  "arrow_sign": {
+    "pointing": ["right"],
+    "contains": ["rainbow_flag"],
+  }
+}
