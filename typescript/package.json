@@ -1,0 +1,19 @@
+{
+    "scripts": {
+        "build": "tsc",
+        "watch": "webpack-dev-server --watch",
+        "prettier": "prettier --write *.json src/**/*.js src/**/*.jsx src/**/*.ts src/**/*.tsx"
+    },
+    "prettier": {
+        "printWidth": 110,
+        "tabWidth": 4
+    },
+    "dependencies": {
+        "prettier": "^1.18.2",
+        "ts-loader": "^6.0.4",
+        "typescript": "^3.5.2",
+        "webpack": "^4.35.2",
+        "webpack-cli": "^3.3.5",
+        "webpack-dev-server": "^3.7.2"
+    }
+}

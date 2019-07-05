@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "moduleResolution": "node",
+        "declaration": true,
+        "outDir": "lib",
+        "module": "commonjs",
+        "sourceMap": true,
+        "jsx": "react",
+
+        "strict": true,
+        "noImplicitReturns": true
+    },  
+    "include": ["./src/**/*.t*"]
+}
