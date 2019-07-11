@@ -1,3 +1,5 @@
+import {square} from "./whateveryouwant"
+
 console.log("A")
 const foo = 5;
 
@@ -64,6 +66,7 @@ function getObjects(g: SceneGraph) : string[] {
 
 console.log(getObjects(mySceneGraph))
 
+console.log(square(5));
 
 
 
