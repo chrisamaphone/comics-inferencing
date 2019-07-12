@@ -138,7 +138,8 @@ function randomInterval(min : number, max : number) : number {
 
 // a.length must be > 0
 export function randomMember(a:any[]) : any {
-    return a[randomInterval(0,a.length-1)];
+    const idx = randomInterval(0,a.length-1);
+    return a[idx];
 }
 
 export function expandHTN(action : action) : Solution {
@@ -150,9 +151,10 @@ export function expandHTN(action : action) : Solution {
     // Otherwise, if it is composite, recursively expand by looking in the
     // dictionary (decomps) for a decomposition of the composite.
     const comp = action as CompositeAction;
-    const candidate_subplans = decomps(comp.action_type);
+    const candidate_subplans : Decomp[] = decomps(comp.action_type);
+    
     if(candidate_subplans) {
-        const subplan : action[] = randomMember(candidate_subplans);
+        const subplan : action[] = (randomMember(candidate_subplans) as Decomp).subplan;
         let children : Solution[] = [];
         for(let i=0; i<subplan.length; i++) {
             const childSol : Solution = expandHTN(subplan[i]);
