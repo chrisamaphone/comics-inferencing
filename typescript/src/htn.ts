@@ -1,3 +1,16 @@
+import * as SG from "./scenegraph"
+
+let operators = {}
+let methods = {}
+
+export interface Task {
+    operator_name : string,
+    args : string[]
+}
+
+
+
+
 
 // Primitive action:
 //  - Action type (operator name)
@@ -6,8 +19,8 @@
 //  - Effects
 interface PrimitiveAction {
     action_type : string,
-    preconditions : string[],
-    effects : string[]
+    preconditions : SG.SceneGraph,
+    effects : SG.SceneGraph
 }
 
 // Composite action:
@@ -47,29 +60,29 @@ type Solution = SolutionNode | PrimitiveAction
 const primitive_blast : PrimitiveAction =
     {
         action_type : "blast",
-        preconditions : ["explosion_at", "entity_at"],
-        effects : ["blasted"]
+        preconditions : [SG.explosion_at_epsilon, SG.hulk_at_epsilon],
+        effects : [SG.hulk_blasted]
     }
 
 const primitive_fall : PrimitiveAction =
     {
         action_type : "fall",
-        preconditions : [],
-        effects : []
+        preconditions : [SG.hulk_blasted],
+        effects : [SG.hulk_falling]
     }
 
 const primitive_fall_prime : PrimitiveAction =
     {
         action_type : "fall'",
-        preconditions : [],
-        effects : []
+        preconditions : [SG.hulk_falling],
+        effects : [SG.hulk_falling]
     }
 
 const primitive_land : PrimitiveAction =
     {
         action_type : "land",
-        preconditions : [],
-        effects : []
+        preconditions : [SG.hulk_falling],
+        effects : [SG.hulk_landed]
     }
 
 const fall_repeat : Decomp = 
