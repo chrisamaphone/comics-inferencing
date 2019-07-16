@@ -116,7 +116,14 @@ const decomp_propel : DecompDefn =
 
 // operators maps node names to operator definitions
 export function operators(name : string) : OperatorDefinition | null {
-    // XXX implement
+    if (name == "fall")
+        return op_fall;
+    if (name == "fall'")
+        return op_fall_prime;
+    if (name == "blast")
+        return op_blast;
+    if (name == "land")
+        return op_land;
     return null;
 }
 

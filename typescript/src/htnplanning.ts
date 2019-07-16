@@ -39,11 +39,11 @@ function join(graph1: SG.SceneGraph, graph2: SG.SceneGraph) : SG.SceneGraph {
 
 // Plug args into the preconditions and effects of an operator
 function groundTask(op: HTN.OperatorDefinition, args: string[]) : {preconds: SG.SceneGraph, effects: SG.SceneGraph} {
+    const grounded = op(args);
     return {
-        preconds: op(args).preconds,
-        effects: op(args).effects
+        preconds: grounded.preconds,
+        effects: grounded.effects
     }
-
 }
 
 // Analog of the operator() method in PyHop
@@ -61,9 +61,8 @@ function applyTask(operator: HTN.OperatorDefinition, args: string[], state: SG.S
 }
 
 // Analog of method() in PyHop
-function applyMethod(method: HTN.DecompDefn, state: SG.SceneGraph, args: string[]) : HTN.Task[] {
-    
-    return [];
+function applyMethod(method: HTN.DecompDefn, args: string[]) : HTN.Task[] {
+    return method(args);
 }
 
 // Port of seekPlan() in PyHop
