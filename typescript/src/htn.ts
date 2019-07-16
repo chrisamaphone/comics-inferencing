@@ -1,7 +1,7 @@
 import * as SG from "./scenegraph"
 
-let operators = {}
-let methods = {}
+export let operators = {}
+export let methods = {}
 
 export interface Task {
     operator_name : string,
@@ -9,15 +9,12 @@ export interface Task {
 }
 
 
-
-
-
 // Primitive action:
 //  - Action type (operator name)
 //  - Label (unique ID)
 //  - Preconditions
 //  - Effects
-interface PrimitiveAction {
+export interface PrimitiveAction {
     action_type : string,
     preconditions : SG.SceneGraph,
     effects : SG.SceneGraph
@@ -27,11 +24,11 @@ interface PrimitiveAction {
 //  - Action type
 //  - Label
 //  - List of decomposition methods
-interface CompositeAction {
+export interface CompositeAction {
     action_type : string
 }
 
-type action = PrimitiveAction | CompositeAction
+export type action = PrimitiveAction | CompositeAction
 
 interface Decomp {
     name : string,
