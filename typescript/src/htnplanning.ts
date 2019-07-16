@@ -1,5 +1,4 @@
 // Adapted from PyHop by Dana Nau: https://bitbucket.org/dananau/pyhop/src/default/
-
 import * as SG from "./scenegraph"
 import * as HTN from "./htn"
 
@@ -37,23 +36,16 @@ function join(graph1: SG.SceneGraph, graph2: SG.SceneGraph) : SG.SceneGraph {
     return graph1.concat(graph2);
 }
 
-// Plug args into the preconditions and effects of an operator
-function groundTask(op: HTN.OperatorDefinition, args: string[]) : {preconds: SG.SceneGraph, effects: SG.SceneGraph} {
-    const grounded = op(args);
-    return {
-        preconds: grounded.preconds,
-        effects: grounded.effects
-    }
-}
-
 // Analog of the operator() method in PyHop
 // TODO: incorporate args
-function applyTask(operator: HTN.OperatorDefinition, args: string[], state: SG.SceneGraph) : SG.SceneGraph | null {
+export function applyTask(operator: HTN.OperatorDefinition, args: string[], state: SG.SceneGraph) : SG.SceneGraph | null {
+    const {preconds, effects} = operator(args);
+    
     // If preconditions hold, modify the state accordingly.
-    const remainder = holds(operator(args).preconds, state);
+    const remainder = holds(preconds, state);
     if(remainder) {
         const smaller = (remainder as SG.SceneGraph);
-        return join(smaller, operator(args).effects);
+        return join(smaller, effects);
     } // Otherwise, return null.
     else { 
         return null;
@@ -61,12 +53,12 @@ function applyTask(operator: HTN.OperatorDefinition, args: string[], state: SG.S
 }
 
 // Analog of method() in PyHop
-function applyMethod(method: HTN.DecompDefn, args: string[]) : HTN.Task[] {
+export function applyMethod(method: HTN.DecompDefn, args: string[]) : HTN.Task[] {
     return method(args);
 }
 
 // Port of seekPlan() in PyHop
-function seekPlan(state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Task[]) : HTN.Task[] | null {
+export function seekPlan(domain: HTN.Domain, state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Task[]) : HTN.Task[] | null {
 
     if(tasks.length == 0) {
         return plan;
@@ -75,16 +67,16 @@ function seekPlan(state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Task[]) : H
     const task1 : HTN.Task = tasks[0];
 
     // Look up task.name in the HTN.operators global dict mapping operator names to PrimitiveActions.
-    if(HTN.operators(task1.operator_name)) {
+    if(domain.operators(task1.operator_name)) {
         
         // Call applyTask() on the resulting action and args.
-        const operator : HTN.OperatorDefinition = HTN.operators(task1.operator_name) as HTN.OperatorDefinition;
+        const operator : HTN.OperatorDefinition = domain.operators(task1.operator_name) as HTN.OperatorDefinition;
         const newState : SG.SceneGraph | null = applyTask(operator, task1.args, state);
 
         // If the application was successful,
         if(newState) {
             plan.push(task1); // append the task to the plan, and keep searching.
-            const solution : HTN.Task[] | null = seekPlan(newState, tasks.slice(1), plan);
+            const solution : HTN.Task[] | null = seekPlan(domain, newState, tasks.slice(1), plan);
 
             if(solution) {
                 return solution;
@@ -93,10 +85,10 @@ function seekPlan(state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Task[]) : H
     }
 
     // If it's not there, look it up in HTN.decomps
-    if(HTN.methods(task1.operator_name)) {
+    if(domain.methods(task1.operator_name)) {
 
         // Call applyMethod() on resulting method candidates 
-        const relevant : HTN.DecompDefn[] = HTN.methods(task1.operator_name) as HTN.DecompDefn[];
+        const relevant : HTN.DecompDefn[] = domain.methods(task1.operator_name) as HTN.DecompDefn[];
 
         // Go through all relevant methods.
         for(let i = 0; i < relevant.length; i++) {
@@ -105,7 +97,7 @@ function seekPlan(state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Task[]) : H
             
             if(subtasks.length > 0) {
                 const newSubtasks = subtasks.concat(tasks.slice(1));
-                const solution : HTN.Task[] | null = seekPlan(state, newSubtasks, plan);
+                const solution : HTN.Task[] | null = seekPlan(domain, state, newSubtasks, plan);
 
                 if(solution) {
                     return solution;
@@ -117,4 +109,8 @@ function seekPlan(state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Task[]) : H
     return null;
 }
 
+/*
+function linearize(s: Solution) : PrimitiveAction[] {
 
+}
+*/

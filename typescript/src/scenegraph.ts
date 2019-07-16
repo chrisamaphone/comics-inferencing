@@ -1,22 +1,16 @@
-enum Relation {
-    At,
-}
+import { Relation } from "./relations"
+import { Attribute } from "./attributes"
 
-enum Attribute {
-    Blasted,
-    Falling,
-    Landed
-
-}
-
-interface RelationEdge {
+// binary relations of a scenegraph
+export interface RelationEdge {
     source: string,
     relation: Relation,
     sink: string,
     type: "RelationEdge"
 }
 
-interface AttributeEdge {
+// unary relations of a scenegraph
+export interface AttributeEdge {
     source: string,
     attribute: Attribute,
     type: "AttributeEdge"
@@ -25,6 +19,55 @@ interface AttributeEdge {
 // A SceneGraph is an array of RelationEdges or AttributeEdges
 export type SceneGraphEdge = RelationEdge | AttributeEdge
 export type SceneGraph = SceneGraphEdge[]
+
+export function equals(g1: SceneGraph, g2: SceneGraph) : boolean {
+
+    if (g1.length != g2.length) {
+        return false;
+    }
+
+    for(let i = 0; i < g1.length; i++) {
+        const g1Edge = g1[i];
+        const g2Edge = g2[i];
+
+        if(g1Edge.type != g2Edge.type) {
+            return false;
+        }
+
+        else if(g1Edge.type == 'AttributeEdge') {
+            if(!attributeEdgeEquals((g1Edge as AttributeEdge), (g2Edge as AttributeEdge))) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+
+}
+
+function relationEdgeEquals(r1: RelationEdge, r2: RelationEdge) : boolean {
+    if(r1.source != r2.source) {
+        return false;
+    }
+    if(r1.relation != r2.relation) {
+        return false;
+    }
+    if (r1.sink != r2.sink) {
+        return false;
+    }
+    return true;
+}
+
+function attributeEdgeEquals(a1: AttributeEdge, a2: AttributeEdge) : boolean {
+    if(a1.source != a2.source) {
+        return false;
+    }
+    if(a1.attribute != a2.attribute) {
+        return false;
+    }
+    return true;
+}
+
 
 function addIfNotMember(a: string[], str: string) {
     for(let i = 0; i < a.length; i++) {
@@ -55,44 +98,4 @@ function getObjects(g: SceneGraph) : string[] {
 }
 
 // Hulk example:
-
-// There is an explosion at the environment.
-export const explosion_at_epsilon : RelationEdge = {
-    source : "explosion",
-    relation : Relation.At,
-    sink: "epsilon", 
-    type: "RelationEdge"
-}
-
-// Hulk is at the environment.
-export const hulk_at_epsilon : RelationEdge = {
-    source : "hulk",
-    relation : Relation.At,
-    sink : "epsilon",
-    type : "RelationEdge"
-}
-
-// Hulk is blasted.
-export const hulk_blasted : AttributeEdge = {
-    source : "hulk",
-    attribute : Attribute.Blasted,
-    type : "AttributeEdge"
-}
-
-// Hulk is falling.
-export const hulk_falling : AttributeEdge = {
-    source : "hulk",
-    attribute : Attribute.Falling,
-    type : "AttributeEdge"
-}
-
-// Hulk has landed.
-export const hulk_landed : AttributeEdge = {
-    source : "hulk",
-    attribute : Attribute.Landed,
-    type : "AttributeEdge"
-}
-
-
-
 
