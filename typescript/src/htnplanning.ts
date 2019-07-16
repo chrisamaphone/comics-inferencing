@@ -68,11 +68,51 @@ function applyMethod(method: HTN.DecompDefn, args: string[]) : HTN.Task[] {
 // Port of seekPlan() in PyHop
 function seekPlan(state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Task[]) : HTN.Task[] | null {
 
-// Look up task.name in the HTN.operators global dict mapping operator names to PrimitiveActions.
-// Call applyTask() on the resulting action and args.
+    if(tasks.length == 0) {
+        return plan;
+    }
 
-// If it's not there, look it up in HTN.decomps
-// call applyMethod() on resulting method candidates (or choose a single method?)
+    const task1 : HTN.Task = tasks[0];
+
+    // Look up task.name in the HTN.operators global dict mapping operator names to PrimitiveActions.
+    if(HTN.operators(task1.operator_name)) {
+        
+        // Call applyTask() on the resulting action and args.
+        const operator : HTN.OperatorDefinition = HTN.operators(task1.operator_name) as HTN.OperatorDefinition;
+        const newState : SG.SceneGraph | null = applyTask(operator, task1.args, state);
+
+        // If the application was successful,
+        if(newState) {
+            plan.push(task1); // append the task to the plan, and keep searching.
+            const solution : HTN.Task[] | null = seekPlan(newState, tasks.slice(1), plan);
+
+            if(solution) {
+                return solution;
+            }
+        }
+    }
+
+    // If it's not there, look it up in HTN.decomps
+    if(HTN.methods(task1.operator_name)) {
+
+        // Call applyMethod() on resulting method candidates 
+        const relevant : HTN.DecompDefn[] = HTN.methods(task1.operator_name) as HTN.DecompDefn[];
+
+        // Go through all relevant methods.
+        for(let i = 0; i < relevant.length; i++) {
+            const method : HTN.DecompDefn = relevant[i];
+            const subtasks : HTN.Task[] = applyMethod(method, task1.args);
+            
+            if(subtasks.length > 0) {
+                const newSubtasks = subtasks.concat(tasks.slice(1));
+                const solution : HTN.Task[] | null = seekPlan(state, newSubtasks, plan);
+
+                if(solution) {
+                    return solution;
+                }
+            }
+        }        
+    }
 
     return null;
 }
