@@ -17,6 +17,7 @@ function removeEdge(edge: SG.SceneGraphEdge, graph: SG.SceneGraph) : SG.SceneGra
 // Checks whether condition is a subgraph of scenegraph.
 // If so, returns (state - condition).
 // Otherwise returns null.
+// TODO: incorporate args
 function holds(condition: SG.SceneGraph, state: SG.SceneGraph) : SG.SceneGraph | null {
     let subgraph : SG.SceneGraph = state;
 
@@ -36,14 +37,23 @@ function join(graph1: SG.SceneGraph, graph2: SG.SceneGraph) : SG.SceneGraph {
     return graph1.concat(graph2);
 }
 
-// Analog of the operator() method in PyHop
-function applyTask(action: HTN.PrimitiveAction, args: string[], state: SG.SceneGraph) : SG.SceneGraph | null {
+// Plug args into the preconditions and effects of an operator
+function groundTask(op: HTN.OperatorDefinition, args: string[]) : {preconds: SG.SceneGraph, effects: SG.SceneGraph} {
+    return {
+        preconds: op(args).preconds,
+        effects: op(args).effects
+    }
 
+}
+
+// Analog of the operator() method in PyHop
+// TODO: incorporate args
+function applyTask(operator: HTN.OperatorDefinition, args: string[], state: SG.SceneGraph) : SG.SceneGraph | null {
     // If preconditions hold, modify the state accordingly.
-    const remainder = holds(action.preconditions, state);
+    const remainder = holds(operator(args).preconds, state);
     if(remainder) {
         const smaller = (remainder as SG.SceneGraph);
-        return join(smaller, action.effects);
+        return join(smaller, operator(args).effects);
     } // Otherwise, return null.
     else { 
         return null;
@@ -51,7 +61,8 @@ function applyTask(action: HTN.PrimitiveAction, args: string[], state: SG.SceneG
 }
 
 // Analog of method() in PyHop
-function applyMethod(state: SG.SceneGraph, tasks: HTN.Task[]) : HTN.Task[] {
+function applyMethod(method: HTN.DecompDefn, state: SG.SceneGraph, args: string[]) : HTN.Task[] {
+    
     return [];
 }
 
@@ -61,7 +72,7 @@ function seekPlan(state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Task[]) : H
 // Look up task.name in the HTN.operators global dict mapping operator names to PrimitiveActions.
 // Call applyTask() on the resulting action and args.
 
-// If it's not there, look it up in HTN.methods
+// If it's not there, look it up in HTN.decomps
 // call applyMethod() on resulting method candidates (or choose a single method?)
 
     return null;

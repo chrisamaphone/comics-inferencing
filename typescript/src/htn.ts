@@ -1,120 +1,146 @@
 import * as SG from "./scenegraph"
 
-export let operators = {}
-export let methods = {}
-
 export interface Task {
     operator_name : string,
     args : string[]
 }
 
-
-// Primitive action:
-//  - Action type (operator name)
-//  - Label (unique ID)
-//  - Preconditions
-//  - Effects
-export interface PrimitiveAction {
-    action_type : string,
-    preconditions : SG.SceneGraph,
-    effects : SG.SceneGraph
+// Operators are defined as functions from arguments to an
+// object {preconditions, effects}.
+export interface OperatorDefinition {
+    (args: string[]): {preconds: SG.SceneGraph, effects: SG.SceneGraph}
 }
 
-// Composite action:
-//  - Action type
-//  - Label
-//  - List of decomposition methods
-export interface CompositeAction {
-    action_type : string
+// Composite actions are defined as lists of decomp definitions,
+// which are functions from arguments to arrays of tasks
+export interface DecompDefn {
+    (args:string[]) : Task[]
 }
 
-export type action = PrimitiveAction | CompositeAction
+// A plan (linearized) is an array of concrete tasks, i.e. task names
+// and operators.
+type plan = Task[]
 
-interface Decomp {
-    name : string,
-    subplan : action[]
-}
-
-type plan = PrimitiveAction[]
-
-/* Solution is either
+/* A Solution tree is either
     - Node:
-        - action_type
-        - label
+        - name
         - list of children (Solutions)
  - Leaf
-    - primitive action
+    - Task (mapping to a primitive action + its args)
 */
 interface SolutionNode {
     action_type : string,
     children : Solution[]
 }
 
-type Solution = SolutionNode | PrimitiveAction
+type Solution = SolutionNode | Task
 
 // Test domain: propel by explosion
 
-const primitive_blast : PrimitiveAction =
-    {
-        action_type : "blast",
-        preconditions : [SG.explosion_at_epsilon, SG.hulk_at_epsilon],
-        effects : [SG.hulk_blasted]
+const op_blast : OperatorDefinition =
+    function(args:string[]) {
+            return { 
+                preconds: [SG.explosion_at_epsilon, SG.hulk_at_epsilon],
+                effects : [SG.hulk_blasted] 
+            }
     }
 
-const primitive_fall : PrimitiveAction =
+const task_blast : Task =
     {
-        action_type : "fall",
-        preconditions : [SG.hulk_blasted],
-        effects : [SG.hulk_falling]
+        operator_name : "blast",
+        args: []
     }
 
-const primitive_fall_prime : PrimitiveAction =
-    {
-        action_type : "fall'",
-        preconditions : [SG.hulk_falling],
-        effects : [SG.hulk_falling]
+const op_fall : OperatorDefinition =
+    function(args:string[]) {
+            return { 
+                preconds : [SG.hulk_blasted],
+                effects : [SG.hulk_falling]
+            }
     }
 
-const primitive_land : PrimitiveAction =
+const task_fall : Task =
     {
-        action_type : "land",
-        preconditions : [SG.hulk_falling],
-        effects : [SG.hulk_landed]
+        operator_name : "fall",
+        args: []
     }
 
-const fall_repeat : Decomp = 
-    {
-        name: "fall_repeat",
-        subplan: [primitive_fall, primitive_fall_prime, primitive_fall_prime]
+const op_fall_prime : OperatorDefinition =
+    function(args:string[]) {
+            return {
+                preconds : [SG.hulk_falling],
+                effects : [SG.hulk_falling]
+            }
     }
 
-const composite_falling : CompositeAction = {
-    action_type : "falling"
+const task_fall_prime : Task =
+    {
+        operator_name : "fall'",
+        args: []
+    }
+
+const op_land : OperatorDefinition =
+    function(args:string[]) {
+            return {
+                preconds : [SG.hulk_falling],
+                effects : [SG.hulk_landed]
+            }
+    }
+
+const task_land : Task =
+    {
+        operator_name : "land",
+        args: []
+    }
+
+const fall_repeat : DecompDefn = 
+    function(args:string[]) {
+            return [task_fall, task_fall_prime, task_fall_prime]
+    }
+
+const task_fall_repeat : Task =
+    {
+        operator_name: "fall_repeat",
+        args: []
+    }
+
+const task_falling : Task = {
+    operator_name: "falling",
+    args: []
 }
 
-const decomp_propel : Decomp =
-{
-    name: "blast_fall_land",
-    subplan: [primitive_blast, composite_falling, primitive_land]
-}
+const decomp_propel : DecompDefn =
+    function(args:string[]) {
+        return [task_blast, task_falling, task_land]
+    }
 
-export const composite_propel_by_explosion : CompositeAction = {
-    action_type : "propel_by_explosion"
+// operators maps node names to operator definitions
+export function operators(name : string) : OperatorDefinition | null {
+    // XXX implement
+    return null;
 }
 
 // decomps maps composite node names to instances of the Decomp type.
 // The values matching an existing composite node must always be nonempty lists.
-function decomps(name : string) : Decomp[] {
+export function methods(name : string) : DecompDefn[] | null {
     if (name == "falling")
         return [fall_repeat];
     if (name == "propel_by_explosion")
         return [decomp_propel];
-    return [];
+    return null;
 }
 
-const falling_node : Solution = {
-    action_type : "falling",
-    children : []
+/*
+Helper functions for expandHTN()
+*/
+function randomInterval(min : number, max : number) : number {
+    return Math.floor(Math.random()*(max+1)) + min;
+}
+
+// a.length must be > 0
+export function randomMember(a:any[]) : any {
+    const idx = randomInterval(0,a.length-1);
+    return a[idx];
 }
 
 /* expandHTN(htn) recursively decomposes composite nodes into 
@@ -141,17 +167,7 @@ const falling_node : Solution = {
             ]
         }
 */
-
-function randomInterval(min : number, max : number) : number {
-    return Math.floor(Math.random()*(max+1)) + min;
-}
-
-// a.length must be > 0
-export function randomMember(a:any[]) : any {
-    const idx = randomInterval(0,a.length-1);
-    return a[idx];
-}
-
+/* TODO: fix to account for operator arguments
 export function expandHTN(action : action) : Solution {
     // If the action, is primitive, return it (leaf of the solution tree)
     if((action as PrimitiveAction).preconditions) {
@@ -174,6 +190,7 @@ export function expandHTN(action : action) : Solution {
     }
     throw new Error("No decomposition found for action "+action.action_type);
 }
+*/
 
 
 /*
