@@ -3,7 +3,10 @@ import * as HTNPlanning from "./htnplanning"
 import * as Domain from "./hulkdomain"
 
 
-export function testApplyTask() {
+// Test the HTNPlanning.applyTask() function
+export function testApplyTask() : boolean {
+
+    console.log("Testing HTNPlanning.applyTask()...")
 
     const blastOp = Domain.operators("blast");
     
@@ -22,13 +25,41 @@ export function testApplyTask() {
         return false;
     }
 
+    console.log("Success. Result: " + JSON.stringify(result));
+
     return true;
 }
 
-function testApplyMethod() {
+export function testApplyMethod() {
 
 }
 
-function testSeekPlan() {
+// Test the HTNPlanning.seekPlan() function
+export function testSeekPlan() : boolean {
 
+    console.log("Testing HTNPlanning.seekPlan()...");
+
+    const result = HTNPlanning.seekPlan(Domain.hulkDomain, Domain.init, [Domain.task_propel], []);
+
+    if(!result) {
+        console.log("Result was null");
+        return false;
+    }
+
+    const expected = [
+        {"operator_name":"blast","args":[]},
+        {"operator_name":"fall","args":[]},
+        {"operator_name":"fall'","args":[]},
+        {"operator_name":"fall'","args":[]},
+        {"operator_name":"land","args":[]}]
+
+    if (JSON.stringify(result!) != JSON.stringify(expected)) {
+        console.log("Result: " + JSON.stringify(result));
+        console.log("Expected: " + JSON.stringify(expected));
+        return false;
+    }
+
+    console.log("Success. Result: " + JSON.stringify(result));
+
+    return true;
 }

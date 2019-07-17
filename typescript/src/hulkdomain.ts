@@ -30,7 +30,7 @@ const op_fall : HTN.OperatorDefinition =
             }
     }
 
-const task_fall : HTN.Task = {
+export const task_fall : HTN.Task = {
         operator_name : "fall",
         args: []
     }
@@ -44,7 +44,7 @@ const op_fall_prime : HTN.OperatorDefinition =
             }
     }
 
-const task_fall_prime : HTN.Task = {
+export const task_fall_prime : HTN.Task = {
         operator_name : "fall'",
         args: []
     }
@@ -58,7 +58,7 @@ const op_land : HTN.OperatorDefinition =
             }
     }
 
-const task_land : HTN.Task = {
+export const task_land : HTN.Task = {
         operator_name : "land",
         args: []
     }
@@ -71,7 +71,7 @@ const fall_repeat : HTN.DecompDefn =
             return [task_fall, task_fall_prime, task_fall_prime]
     }
 
-const task_falling : HTN.Task = {
+export const task_falling : HTN.Task = {
     operator_name: "falling",
     args: []
 }
@@ -82,7 +82,7 @@ const propel : HTN.DecompDefn =
         return [task_blast, task_falling, task_land]
     }
 
-const task_propel : HTN.Task = {
+export const task_propel : HTN.Task = {
     operator_name: "propel",
     args: []
 }

@@ -8,7 +8,8 @@ import * as HTNUnitTest from "./testhtnplanning"
 // console.log("Expanding propel by explosion:")
 // console.log(expandHTN(composite_propel_by_explosion));
 console.log("---- UNIT TESTS ----")
-console.log(JSON.stringify(HTNUnitTest.testApplyTask()));
+console.log("applyTask(): " + JSON.stringify(HTNUnitTest.testApplyTask()));
+console.log("seekPlan(): " + JSON.stringify(HTNUnitTest.testSeekPlan()));
 
 const mydiv = document.getElementById("main");
 mydiv!.innerHTML = "Hello, world!";

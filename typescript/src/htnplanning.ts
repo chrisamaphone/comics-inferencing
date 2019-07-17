@@ -58,6 +58,13 @@ export function applyMethod(method: HTN.DecompDefn, args: string[]) : HTN.Task[]
 }
 
 // Port of seekPlan() in PyHop
+/*
+    seekPlan(domain, init, tasks, plan) = solution
+    iff
+    [solution] is a sequence of ground primitive tasks that can execute 
+    the input task sequence [tasks] on the initial state [init] under the 
+    rules in [domain].
+*/
 export function seekPlan(domain: HTN.Domain, state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Task[]) : HTN.Task[] | null {
 
     if(tasks.length == 0) {
