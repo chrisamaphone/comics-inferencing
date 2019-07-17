@@ -26,7 +26,8 @@ export function equals(g1: SceneGraph, g2: SceneGraph) : boolean {
         return false;
     }
 
-    for(let i = 0; i < g1.length; i++) {
+    for(let i = 0; i < g1.length; i++) 
+    {
         const g1Edge = g1[i];
         const g2Edge = g2[i];
 
@@ -36,6 +37,12 @@ export function equals(g1: SceneGraph, g2: SceneGraph) : boolean {
 
         else if(g1Edge.type == 'AttributeEdge') {
             if(!attributeEdgeEquals((g1Edge as AttributeEdge), (g2Edge as AttributeEdge))) {
+                return false;
+            }
+        }
+
+        else {
+            if(!relationEdgeEquals((g1Edge as RelationEdge), (g2Edge as RelationEdge))) {
                 return false;
             }
         }

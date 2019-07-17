@@ -8,7 +8,11 @@ import * as HTNUnitTest from "./testhtnplanning"
 // console.log("Expanding propel by explosion:")
 // console.log(expandHTN(composite_propel_by_explosion));
 console.log("---- UNIT TESTS ----")
-console.log("applyTask(): " + JSON.stringify(HTNUnitTest.testApplyTask()));
+console.log("applyTask():");
+console.log(">> In an applicable state: " + JSON.stringify(HTNUnitTest.testApplyTaskInApplicableState()));
+console.log(">> In a non-applicable state: " + JSON.stringify(HTNUnitTest.testApplyTaskInNonApplicableState()));
+
+
 console.log("seekPlan(): " + JSON.stringify(HTNUnitTest.testSeekPlan()));
 
 const mydiv = document.getElementById("main");
