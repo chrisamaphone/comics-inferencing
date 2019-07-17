@@ -5,7 +5,7 @@ import * as HTN from "./htn"
 function removeEdge(edge: SG.SceneGraphEdge, graph: SG.SceneGraph) : SG.SceneGraph | null {
     let prefix : SG.SceneGraph = [];
     for(let i = 0; i < graph.length; i++) {
-        if(graph[i] == edge) {
+        if(SG.equals([graph[i]], [edge])) {
             return prefix.concat(graph.slice(i+1))
         }
         prefix.push(graph[i]);
@@ -16,7 +16,6 @@ function removeEdge(edge: SG.SceneGraphEdge, graph: SG.SceneGraph) : SG.SceneGra
 // Checks whether condition is a subgraph of scenegraph.
 // If so, returns (state - condition).
 // Otherwise returns null.
-// TODO: incorporate args
 function holds(condition: SG.SceneGraph, state: SG.SceneGraph) : SG.SceneGraph | null {
     let subgraph : SG.SceneGraph = state;
 
@@ -40,7 +39,7 @@ function join(graph1: SG.SceneGraph, graph2: SG.SceneGraph) : SG.SceneGraph {
 // TODO: incorporate args
 export function applyTask(operator: HTN.OperatorDefinition, args: string[], state: SG.SceneGraph) : SG.SceneGraph | null {
     const {preconds, effects} = operator(args);
-    
+        
     // If preconditions hold, modify the state accordingly.
     const remainder = holds(preconds, state);
     if(remainder) {

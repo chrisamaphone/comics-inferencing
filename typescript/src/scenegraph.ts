@@ -16,6 +16,27 @@ export interface AttributeEdge {
     type: "AttributeEdge"
 }
 
+// makes a RelationEdge
+export function makeRelation(source: string, rel: Relation, sink: string) : RelationEdge {
+    return {
+        source: source,
+        relation: rel,
+        sink: sink,
+        type: "RelationEdge"
+    };
+}
+
+// makes a AttributeEdge
+export function makeAttribute(source: string, attr: Attribute) : AttributeEdge {
+    return {
+        source: source,
+        attribute: attr,
+        type: "AttributeEdge"
+    };
+}
+
+
+
 // A SceneGraph is an array of RelationEdges or AttributeEdges
 export type SceneGraphEdge = RelationEdge | AttributeEdge
 export type SceneGraph = SceneGraphEdge[]
@@ -26,7 +47,8 @@ export function equals(g1: SceneGraph, g2: SceneGraph) : boolean {
         return false;
     }
 
-    for(let i = 0; i < g1.length; i++) {
+    for(let i = 0; i < g1.length; i++) 
+    {
         const g1Edge = g1[i];
         const g2Edge = g2[i];
 
@@ -36,6 +58,12 @@ export function equals(g1: SceneGraph, g2: SceneGraph) : boolean {
 
         else if(g1Edge.type == 'AttributeEdge') {
             if(!attributeEdgeEquals((g1Edge as AttributeEdge), (g2Edge as AttributeEdge))) {
+                return false;
+            }
+        }
+
+        else {
+            if(!relationEdgeEquals((g1Edge as RelationEdge), (g2Edge as RelationEdge))) {
                 return false;
             }
         }
