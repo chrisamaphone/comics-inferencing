@@ -116,8 +116,13 @@ export function seekPlan(domain: HTN.Domain, state: SG.SceneGraph, tasks: HTN.Ta
     return null;
 }
 
-/*
+/* TODO: eventually modify above to return a tree, then linearize it with this function.
 function linearize(s: Solution) : PrimitiveAction[] {
 
 }
 */
+
+export function 
+    seekEventStructure(domain : HTN.Domain, init: SG.SceneGraph, plan: HTN.Task[]) : HTN.Task[] | null {
+        return null;
+}

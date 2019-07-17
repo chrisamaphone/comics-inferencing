@@ -111,7 +111,11 @@ export function methods(name : string) : HTN.DecompDefn[] | null {
 }
 
 // The Hulk Domain! HULK SMASH
-export const hulkDomain : HTN.Domain = {operators: operators, methods: methods};
+export const hulkDomain : HTN.Domain = {
+    operators: operators, 
+    methods: methods,
+    allKeys: ["falling", "propel", "fall", "fall'", "blast", "land"]
+};
 
 // ---- Ground Literal Definitions
 

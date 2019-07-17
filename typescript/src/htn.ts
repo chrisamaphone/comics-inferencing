@@ -30,7 +30,8 @@ export interface MethodLibrary {
 // HTN Domain definition
 export interface Domain {
     operators : OperatorLibrary,
-    methods : MethodLibrary
+    methods : MethodLibrary,
+    allKeys : string[]
 }
 
 // A plan (linearized) is an array of concrete tasks, i.e. task names
@@ -50,12 +51,4 @@ interface SolutionNode {
 }
 
 type Solution = SolutionNode | Task
-
-
-
-
-
- 
-
-
 
