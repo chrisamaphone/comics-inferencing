@@ -35,7 +35,7 @@ export interface Domain {
 
 // A plan (linearized) is an array of concrete tasks, i.e. task names
 // and operators.
-type plan = Task[]
+type Plan = Task[]
 
 /* A Solution tree is either
     - Node:

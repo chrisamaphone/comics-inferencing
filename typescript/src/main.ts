@@ -9,9 +9,8 @@ import * as HTNUnitTest from "./testhtnplanning"
 // console.log(expandHTN(composite_propel_by_explosion));
 console.log("---- UNIT TESTS ----")
 console.log("applyTask():");
-console.log(">> In an applicable state: " + JSON.stringify(HTNUnitTest.testApplyTaskInApplicableState()));
-console.log(">> In a non-applicable state: " + JSON.stringify(HTNUnitTest.testApplyTaskInNonApplicableState()));
-
+HTNUnitTest.testApplyTaskInApplicableState();
+HTNUnitTest.testApplyTaskInNonApplicableState();
 
 console.log("seekPlan(): " + JSON.stringify(HTNUnitTest.testSeekPlan()));
 

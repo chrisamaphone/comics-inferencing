@@ -16,6 +16,27 @@ export interface AttributeEdge {
     type: "AttributeEdge"
 }
 
+// makes a RelationEdge
+export function makeRelation(source: string, rel: Relation, sink: string) : RelationEdge {
+    return {
+        source: source,
+        relation: rel,
+        sink: sink,
+        type: "RelationEdge"
+    };
+}
+
+// makes a AttributeEdge
+export function makeAttribute(source: string, attr: Attribute) : AttributeEdge {
+    return {
+        source: source,
+        attribute: attr,
+        type: "AttributeEdge"
+    };
+}
+
+
+
 // A SceneGraph is an array of RelationEdges or AttributeEdges
 export type SceneGraphEdge = RelationEdge | AttributeEdge
 export type SceneGraph = SceneGraphEdge[]

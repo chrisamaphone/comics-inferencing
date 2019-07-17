@@ -7,84 +7,131 @@ import {Attribute} from "./attributes"
 
 // ---- Operator Definitions
 
-// blast operator and task
+
+// blast:
+// explosion_at(env) * at(agent, env) -o blasted(agent)
 const op_blast : HTN.OperatorDefinition =
     function(args:string[]) {
-            return { 
-                preconds: [explosion_at_epsilon, hulk_at_epsilon],
-                effects : [hulk_blasted] 
-            }
+        const env : string = args[0];
+        const agent : string = args[1];
+        
+        // explosion_at(env)
+        const explosion_at_env = SG.makeRelation("explosion", Relation.At, env);
+        
+        // at(agent, env)
+        const agent_at_env = SG.makeRelation(agent, Relation.At, env);
+        
+        // blasted(agent)
+        const blasted_agent = SG.makeAttribute(agent, Attribute.Blasted);
+        
+        return { 
+           preconds: [explosion_at_env, agent_at_env],
+           effects : [blasted_agent] 
+        }
     }
 
-const task_blast : HTN.Task = {
-        operator_name : "blast",
-        args: []
-    }
 
-// fall operator and task
+// fall:
+// blasted(agent) -o falling(agent)
 const op_fall : HTN.OperatorDefinition =
     function(args:string[]) {
-            return { 
-                preconds : [hulk_blasted],
-                effects : [hulk_falling]
-            }
+        const agent : string = args[0]
+
+        // blasted(agent)
+        const blasted_agent = SG.makeAttribute(agent, Attribute.Blasted);
+
+        // falling(agent)
+        const falling_agent = SG.makeAttribute(agent, Attribute.Falling);
+
+        return { 
+            preconds : [blasted_agent],
+            effects : [falling_agent]
+        }
     }
 
-export const task_fall : HTN.Task = {
-        operator_name : "fall",
-        args: []
-    }
 
-// fall prime operator and task
+// falling(agent) -o falling(agent)
 const op_fall_prime : HTN.OperatorDefinition =
     function(args:string[]) {
-            return {
-                preconds : [hulk_falling],
-                effects : [hulk_falling]
-            }
+
+        const agent : string = args[0];
+
+        // falling(agent)
+        const falling_agent = SG.makeAttribute(agent, Attribute.Falling);
+
+        return {
+            preconds : [falling_agent],
+            effects : [falling_agent]
+        }
     }
 
-export const task_fall_prime : HTN.Task = {
-        operator_name : "fall'",
-        args: []
-    }
 
-// land operator and task
+// falling(agent) -o landed(agent)
 const op_land : HTN.OperatorDefinition =
     function(args:string[]) {
-            return {
-                preconds : [hulk_falling],
-                effects : [hulk_landed]
-            }
+
+        const agent : string = args[0];
+
+        // falling(agent)
+        const falling_agent = SG.makeAttribute(agent, Attribute.Falling);
+
+        // landed(agent)
+        const landed_agent = SG.makeAttribute(agent, Attribute.Landed);
+
+        return {
+            preconds : [falling_agent],
+            effects : [landed_agent]
+        }
     }
 
-export const task_land : HTN.Task = {
-        operator_name : "land",
-        args: []
-    }
 
 // ---- Decomposition Definitions    
 
-// fall repeat decomposition and task
+// fall repeat decomposition and tasks
 const fall_repeat : HTN.DecompDefn = 
     function(args:string[]) {
-            return [task_fall, task_fall_prime, task_fall_prime]
+        const agent : string = args[0];
+        const task_fall = {
+            operator_name: "fall",
+            args: [agent]
+        }
+
+        const task_fall_prime = {
+            operator_name: "fall'",
+            args: [agent]
+        }
+
+        return [task_fall, task_fall_prime, task_fall_prime]
     }
 
-export const task_falling : HTN.Task = {
-    operator_name: "falling",
-    args: []
-}
 
-// propel decomposition and task
+// propel decomposition and tasks
 const propel : HTN.DecompDefn =
     function(args:string[]) {
+        const env : string = args[0];
+        const agent : string = args[1];
+
+        const task_blast = {
+            operator_name: "blast",
+            args: [env, agent]
+        }
+
+        const task_falling = {
+            operator_name: "falling",
+            args: [agent]
+        }
+        
+        const task_land = {
+            operator_name: "land",
+            args: [agent]
+        }
+
         return [task_blast, task_falling, task_land]
     }
 
 export const task_propel : HTN.Task = {
     operator_name: "propel",
-    args: []
+    args: ["epsilon", "hulk"]
 }
 
 // operators maps node names to operator definitions
