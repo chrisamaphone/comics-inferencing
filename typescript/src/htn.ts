@@ -36,7 +36,7 @@ export interface Domain {
 
 // A plan (linearized) is an array of concrete tasks, i.e. task names
 // and operators.
-type Plan = Task[]
+export type Plan = Task[]
 
 /* A Solution tree is either
     - Node:
@@ -45,10 +45,10 @@ type Plan = Task[]
  - Leaf
     - Task (mapping to a primitive action + its args)
 */
-interface SolutionNode {
+export interface SolutionNode {
     action_type : string,
     children : Solution[]
 }
 
-type Solution = SolutionNode | Task
+export type Solution = SolutionNode | Task
 

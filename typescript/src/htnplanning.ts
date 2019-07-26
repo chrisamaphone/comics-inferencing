@@ -64,7 +64,7 @@ export function applyMethod(method: HTN.DecompDefn, args: string[]) : HTN.Task[]
     the input task sequence [tasks] on the initial state [init] under the 
     rules in [domain].
 */
-export function seekPlan(domain: HTN.Domain, state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Task[]) : HTN.Task[] | null {
+export function seekPlan(domain: HTN.Domain, state: SG.SceneGraph, tasks: HTN.Task[], plan: HTN.Plan) : HTN.Plan | null {
 
     if(tasks.length == 0) {
         return plan;
@@ -115,13 +115,73 @@ export function seekPlan(domain: HTN.Domain, state: SG.SceneGraph, tasks: HTN.Ta
     return null;
 }
 
-/* TODO: eventually modify above to return a tree, then linearize it with this function.
-function linearize(s: Solution) : PrimitiveAction[] {
 
-}
+/*
+    Version of solver with tree-structured output
 */
+export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, problem : HTN.Task) : HTN.Solution | null {
 
-export function 
-    seekEventStructure(domain : HTN.Domain, init: SG.SceneGraph, plan: HTN.Task[]) : HTN.Task[] | null {
-        return null;
+    // Look up task.name in the HTN.operators global dict mapping operator names to PrimitiveActions.
+    if(domain.operators(problem.operator_name)) {
+        
+        // Call applyTask() on the resulting action and args.
+        const operator : HTN.OperatorDefinition = domain.operators(problem.operator_name) as HTN.OperatorDefinition;
+        const newState : SG.SceneGraph | null = applyTask(operator, problem.args, state);
+
+        // If the application of operator was successful, this task it itself the solution.
+        if(newState) {
+            return problem;
+        }
+    }
+
+    // If it's not there, look it up in HTN.decomps
+    if(domain.methods(problem.operator_name)) {
+
+        // Call applyMethod() on resulting method candidates 
+        const relevant : HTN.DecompDefn[] = domain.methods(problem.operator_name) as HTN.DecompDefn[];
+
+        // Go through all relevant methods.
+        for(let i = 0; i < relevant.length; i++) {
+            const method : HTN.DecompDefn = relevant[i];
+            const subtasks : HTN.Task[] = applyMethod(method, problem.args);
+            let child_sols = []
+            
+
+            for(let i=0; i < subtasks.length; i++) {
+                const child_sol : HTN.Solution | null = seekEventStructure(domain, state, subtasks[i]);
+                if(child_sol) {
+                    child_sols.push(child_sol);
+                } else { // No solution for a child
+                    return null;
+                }
+            }
+
+            const new_node : HTN.SolutionNode =
+            {
+                action_type: method.name,
+                children: child_sols
+            }
+
+            return new_node;
+        }        
+    }
+
+    return null;
 }
+
+/* linearize : Solution -> Task[] (sequence of primitive tasks at the leaves of the sol)
+*/
+function linearize(s: HTN.Solution) : HTN.Plan {
+    if (s as HTN.Task) {
+        return [s as HTN.Task];
+    } else {
+        const n : HTN.SolutionNode = s as HTN.SolutionNode;
+        let p : HTN.Plan = [];
+        for(let i = 0; i < n.children.length; i++) { 
+            const child_plan = linearize(n.children[i]);
+            p = p.concat(child_plan);
+        }
+        return p;
+    }
+}
+

@@ -64,6 +64,7 @@ export function testApplyMethod() {
 
 }
 
+
 // Test the HTNPlanning.seekPlan() function
 export function testSeekPlan() : boolean {
 
@@ -92,4 +93,13 @@ export function testSeekPlan() : boolean {
     console.log("Success! Result: " + JSON.stringify(result));
 
     return true;
+}
+
+// Testing HTNPlanning.seekEventStructure
+export function testSeekEventStructure() {
+    const result = HTNPlanning.seekEventStructure(Domain.hulkDomain, Domain.init, Domain.task_propel);
+
+  //  console.log("Result of tree search: " + JSON.stringify(result));
+
+    return result;
 }
