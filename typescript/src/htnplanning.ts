@@ -2,49 +2,16 @@
 import * as SG from "./scenegraph"
 import * as HTN from "./htn"
 
-function removeEdge(edge: SG.SceneGraphEdge, graph: SG.SceneGraph) : SG.SceneGraph | null {
-    let prefix : SG.SceneGraph = [];
-    for(let i = 0; i < graph.length; i++) {
-        if(SG.equals([graph[i]], [edge])) {
-            return prefix.concat(graph.slice(i+1))
-        }
-        prefix.push(graph[i]);
-    }
-    return null;
-}
-
-// Checks whether condition is a subgraph of scenegraph.
-// If so, returns (state - condition).
-// Otherwise returns null.
-function holds(condition: SG.SceneGraph, state: SG.SceneGraph) : SG.SceneGraph | null {
-    let subgraph : SG.SceneGraph = state;
-
-    // Remove each condition, as long as it exists in the state.
-    for(let i=0; i<condition.length; i++) {
-        const check = removeEdge(condition[i], subgraph);
-        if(!check) { // The condition is not in the scene graph
-            return null;
-        }
-        subgraph = (check as SG.SceneGraph);
-    }
-    return subgraph;
-}
-
-// Union two scene graphs together
-function join(graph1: SG.SceneGraph, graph2: SG.SceneGraph) : SG.SceneGraph {
-    return graph1.concat(graph2);
-}
-
 // Analog of the operator() method in PyHop
 // TODO: incorporate args
 export function applyTask(operator: HTN.OperatorDefinition, args: string[], state: SG.SceneGraph) : SG.SceneGraph | null {
     const {preconds, effects} = operator(args);
         
     // If preconditions hold, modify the state accordingly.
-    const remainder = holds(preconds, state);
+    const remainder = SG.holds(preconds, state);
     if(remainder) {
         const smaller = (remainder as SG.SceneGraph);
-        return join(smaller, effects);
+        return SG.join(smaller, effects);
     } // Otherwise, return null.
     else { 
         return null;
@@ -135,7 +102,7 @@ export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, pr
     }
 
     // If it's not there, look it up in HTN.decomps
-    if(domain.methods(problem.operator_name)) {
+    else if(domain.methods(problem.operator_name)) {
 
         // Call applyMethod() on resulting method candidates 
         const relevant : HTN.DecompDefn[] = domain.methods(problem.operator_name) as HTN.DecompDefn[];
@@ -184,4 +151,41 @@ function linearize(s: HTN.Solution) : HTN.Plan {
         return p;
     }
 }
+
+/* Correctness condition:
+    If
+        seekPlan(domain, state, [problem], []:plan) = somePlan
+    then
+        linearize(seekEventStructure(domain, state, problem)) = somePlan
+    and vice versa.
+
+    XXX - still need to test this
+*/
+
+/*
+Friday, 8/23/2019
+TO DO for next time: modify seekEventStructure to also return an array of intermediate states.
+    Then work on this function: it needs to match the comic to that list.
+    Actually, "linearize" may not really be useful at all.
+
+function seekMatchingEventStructure(domain : HTN.Domain, comic : SG.SceneGraph[]) : HTN.Solution | null {
+    
+    for(let i=0; i < domain.allKeys.length; i++) {
+        const topLevelTaskName : string = domain.allKeys[i];
+        // Also need to iterate through all possible args
+        const trySol =
+            seekEventStructure(domain, comic[0], {operator_name:topLevelTaskName, args:[]});
+        if (trySol as HTN.Solution) {
+            const linearSol = linearize(trySol as HTN.Solution);
+            // XXX - what we actually need is the sequence of intermediate states.
+            if (SG.matchPanelSequence(comic, linearSol)) {
+                return (trySol as HTN.Solution);
+            }
+        }
+    }
+    
+    return null;
+}
+*/
+
 

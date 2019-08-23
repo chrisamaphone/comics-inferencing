@@ -1,11 +1,14 @@
 
 /*
-Helper functions for expandHTN()
+Helper functions
 */
+
+// Get a random number between min and max.
 function randomInterval(min : number, max : number) : number {
     return Math.floor(Math.random()*(max+1)) + min;
 }
 
+// Get a random element of a.
 // a.length must be > 0
 export function randomMember(a:any[]) : any {
     const idx = randomInterval(0,a.length-1);
@@ -19,13 +22,13 @@ export function randomMember(a:any[]) : any {
 // w = [3, 8, 8, 4]
 // s = [1, 2, 3, 3, 2, 8, 0, 4, 12]
 // subseq(w, s)) => true
-function match_subseq<T>(leq : (x:T, y:T) => boolean, window : T[], seq : T[]) {
+export function match_subseq<T>(leq : (x:T, y:T) => boolean, window : T[], seq : T[]) {
     for(let i=0; i < window.length; i++) {
         let found = false;
         
         // Search for seq[i] in window
         for(let j=0; j < seq.length && !found; j++) {
-            if (leq(seq[j], window[i])) { // eventually replace with generic match fn
+            if (leq(seq[j], window[i])) {
                 seq = seq.slice(j+1);
                 found = true;
             }

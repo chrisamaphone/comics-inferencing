@@ -1,5 +1,6 @@
 import { Relation } from "./relations"
 import { Attribute } from "./attributes"
+import * as Util from "./util"
 
 // binary relations of a scenegraph
 export interface RelationEdge {
@@ -96,34 +97,45 @@ function attributeEdgeEquals(a1: AttributeEdge, a2: AttributeEdge) : boolean {
     return true;
 }
 
-
-function addIfNotMember(a: string[], str: string) {
-    for(let i = 0; i < a.length; i++) {
-        if(a[i] == str) {
-            return;
-        } 
-    }
-
-    a.push(str);
-}
-
-
-function getObjects(g: SceneGraph) : string[] {
-
-    let objects:string[] = [];
-
-    for(let i = 0; i < g.length; i++) {
-        const edge = g[i];
-
-        addIfNotMember(objects, edge.source);
-        
-        if((edge as RelationEdge).sink) {
-            addIfNotMember(objects, (edge as RelationEdge).sink);
+function removeEdge(edge: SceneGraphEdge, graph: SceneGraph) : SceneGraph | null {
+    let prefix : SceneGraph = [];
+    for(let i = 0; i < graph.length; i++) {
+        if(equals([graph[i]], [edge])) {
+            return prefix.concat(graph.slice(i+1))
         }
+        prefix.push(graph[i]);
     }
-
-    return objects;
+    return null;
 }
 
-// Hulk example:
+// Checks whether condition is a subgraph of scenegraph.
+// If so, returns (state - condition).
+// Otherwise returns null.
+export function holds(condition: SceneGraph, state: SceneGraph) : SceneGraph | null {
+    let subgraph : SceneGraph = state;
 
+    // Remove each condition, as long as it exists in the state.
+    for(let i=0; i<condition.length; i++) {
+        const check = removeEdge(condition[i], subgraph);
+        if(!check) { // The condition is not in the scene graph
+            return null;
+        }
+        subgraph = (check as SceneGraph);
+    }
+    return subgraph;
+}
+
+// Union two scene graphs together
+export function join(graph1: SceneGraph, graph2: SceneGraph) : SceneGraph {
+    return graph1.concat(graph2);
+}
+
+export function isSubgraph(smaller: SceneGraph, bigger: SceneGraph) : boolean {
+    if(holds(smaller, bigger))
+        return true;
+    return false;
+}
+
+export function matchPanelSequence(shorter: SceneGraph[], longer: SceneGraph[]) : boolean {
+    return Util.match_subseq(isSubgraph, shorter, longer);
+}
