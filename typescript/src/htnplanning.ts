@@ -83,10 +83,16 @@ export function seekPlan(domain: HTN.Domain, state: SG.SceneGraph, tasks: HTN.Ta
 }
 
 
+interface Solution {
+    sol: HTN.Solution,
+    states: SG.SceneGraph[],
+    last_state: SG.SceneGraph
+}
+
 /*
     Version of solver with tree-structured output
 */
-export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, problem : HTN.Task) : HTN.Solution | null {
+export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, problem : HTN.Task) : Solution | null {
 
     // Look up task.name in the HTN.operators global dict mapping operator names to PrimitiveActions.
     if(domain.operators(problem.operator_name)) {
@@ -97,7 +103,7 @@ export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, pr
 
         // If the application of operator was successful, this task it itself the solution.
         if(newState) {
-            return problem;
+            return {sol: problem, states: [state], last_state: newState}
         }
     }
 
@@ -112,21 +118,33 @@ export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, pr
             const method : HTN.DecompDefn = relevant[i];
             const subtasks : HTN.Task[] = applyMethod(method, problem.args);
             let child_sols = []
-            
+            let child_states : SG.SceneGraph[] = []
+            let last_state = state;
 
             for(let i=0; i < subtasks.length; i++) {
-                const child_sol : HTN.Solution | null = seekEventStructure(domain, state, subtasks[i]);
-                if(child_sol) {
+                const child_sol_and_states : Solution | null = seekEventStructure(domain, last_state, subtasks[i]);
+                if(child_sol_and_states) {
+                    const child_sol = child_sol_and_states.sol;
+                    const states = child_sol_and_states.states;
+                    last_state = child_sol_and_states.last_state;
                     child_sols.push(child_sol);
+                    child_states.concat(states);
                 } else { // No solution for a child
                     return null;
                 }
             }
 
-            const new_node : HTN.SolutionNode =
+            const new_sol : HTN.SolutionNode =
             {
                 action_type: method.name,
                 children: child_sols
+            }
+
+            const new_node : Solution =
+            {
+                sol: new_sol,
+                states: child_states,
+                last_state: last_state
             }
 
             return new_node;
@@ -138,6 +156,7 @@ export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, pr
 
 /* linearize : Solution -> Task[] (sequence of primitive tasks at the leaves of the sol)
 */
+/* XXX - maybe not actually useful
 function linearize(s: HTN.Solution) : HTN.Plan {
     if (s as HTN.Task) {
         return [s as HTN.Task];
@@ -150,23 +169,17 @@ function linearize(s: HTN.Solution) : HTN.Plan {
         }
         return p;
     }
-}
-
+} */
 /* Correctness condition:
     If
         seekPlan(domain, state, [problem], []:plan) = somePlan
     then
-        linearize(seekEventStructure(domain, state, problem)) = somePlan
+        linearize(seekEventStructure(domain, state, problem).sol) = somePlan
     and vice versa.
 
     XXX - still need to test this
 */
 
-/*
-Friday, 8/23/2019
-TO DO for next time: modify seekEventStructure to also return an array of intermediate states.
-    Then work on this function: it needs to match the comic to that list.
-    Actually, "linearize" may not really be useful at all.
 
 function seekMatchingEventStructure(domain : HTN.Domain, comic : SG.SceneGraph[]) : HTN.Solution | null {
     
@@ -175,17 +188,21 @@ function seekMatchingEventStructure(domain : HTN.Domain, comic : SG.SceneGraph[]
         // Also need to iterate through all possible args
         const trySol =
             seekEventStructure(domain, comic[0], {operator_name:topLevelTaskName, args:[]});
-        if (trySol as HTN.Solution) {
-            const linearSol = linearize(trySol as HTN.Solution);
+        if (trySol as Solution) {
+            const sol = trySol as Solution;
+            const events : HTN.Solution = sol.sol;
+            const states : SG.SceneGraph[] = sol.states;
+            states.push(sol.last_state);
+
             // XXX - what we actually need is the sequence of intermediate states.
-            if (SG.matchPanelSequence(comic, linearSol)) {
-                return (trySol as HTN.Solution);
+            if (SG.matchPanelSequence(comic, states)) {
+                return (events as HTN.Solution);
             }
         }
     }
     
     return null;
 }
-*/
+
 
 
