@@ -157,13 +157,19 @@ export function methods(name : string) : HTN.DecompDefn[] | null {
     return null;
 }
 
+const falling_task = {operator_name:"falling", args:["hulk"]};
+const propel_task = {operator_name:"propel", args:["hulk"]};
+const fall_task = {operator_name:"fall", args:["hulk"]};
+const fallprime_task = {operator_name:"fall'", args:["hulk"]};
+const blast_task = {operator_name:"blast", args:["hulk"]};
+const land_task = {operator_name:"land", args:["hulk"]};
+
 // The Hulk Domain! HULK SMASH
 export const hulkDomain : HTN.Domain = {
     operators: operators, 
     methods: methods,
-    allKeys: ["falling", "propel", "fall", "fall'", "blast", "land"]
-};
-
+    groundTasks: [falling_task, propel_task, fall_task, fallprime_task, blast_task, land_task]
+}
 // ---- Ground Literal Definitions
 
 // There is an explosion at the environment.

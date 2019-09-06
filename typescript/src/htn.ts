@@ -31,7 +31,7 @@ export interface MethodLibrary {
 export interface Domain {
     operators : OperatorLibrary,
     methods : MethodLibrary,
-    allKeys : string[]
+    groundTasks : Task[]
 }
 
 // A plan (linearized) is an array of concrete tasks, i.e. task names

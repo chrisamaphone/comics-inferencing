@@ -85,13 +85,14 @@ export function seekPlan(domain: HTN.Domain, state: SG.SceneGraph, tasks: HTN.Ta
 
 export interface Solution {
     sol: HTN.Solution,
-    states: SG.SceneGraph[],
+    states: SG.SceneGraph[], // the intermediate states computed by applying the leaves of the sol
     last_state: SG.SceneGraph
 }
 
 /*
     Version of solver with tree-structured output
 */
+// Must be tested
 export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, problem : HTN.Task) : Solution | null {
 
     // Look up task.name in the HTN.operators global dict mapping operator names to PrimitiveActions.
@@ -181,13 +182,20 @@ function linearize(s: HTN.Solution) : HTN.Plan {
 */
 
 
+// produces an HTN -- return all such that satisfy
 export function seekMatchingEventStructure(domain : HTN.Domain, comic : SG.SceneGraph[]) : HTN.Solution | null {
     
-    for(let i=0; i < domain.allKeys.length; i++) {
-        const topLevelTaskName : string = domain.allKeys[i];
-        // TODO: Also need to iterate through all possible args
-        const trySol =
-            seekEventStructure(domain, comic[0], {operator_name:topLevelTaskName, args:[]});
+    // loop over all tasks in the domain
+    for(let i=0; i < domain.groundTasks.length; i++) 
+    {
+        const topLevelTask : HTN.Task = domain.groundTasks[i]; 
+        // loop through and check if it can make sense as root
+
+        // talk about how to represent these arguments to cycle through them
+        // Also need to iterate through all possible args -> not necessary, all domain ground tasks
+        // will be specified as input
+        const trySol = seekEventStructure(domain, comic[0], topLevelTask);
+        
         if (trySol as Solution) {
             const sol = trySol as Solution;
             const events : HTN.Solution = sol.sol;
