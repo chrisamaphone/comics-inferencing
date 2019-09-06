@@ -83,7 +83,7 @@ export function seekPlan(domain: HTN.Domain, state: SG.SceneGraph, tasks: HTN.Ta
 }
 
 
-interface Solution {
+export interface Solution {
     sol: HTN.Solution,
     states: SG.SceneGraph[],
     last_state: SG.SceneGraph
@@ -181,11 +181,11 @@ function linearize(s: HTN.Solution) : HTN.Plan {
 */
 
 
-function seekMatchingEventStructure(domain : HTN.Domain, comic : SG.SceneGraph[]) : HTN.Solution | null {
+export function seekMatchingEventStructure(domain : HTN.Domain, comic : SG.SceneGraph[]) : HTN.Solution | null {
     
     for(let i=0; i < domain.allKeys.length; i++) {
         const topLevelTaskName : string = domain.allKeys[i];
-        // Also need to iterate through all possible args
+        // TODO: Also need to iterate through all possible args
         const trySol =
             seekEventStructure(domain, comic[0], {operator_name:topLevelTaskName, args:[]});
         if (trySol as Solution) {
@@ -194,7 +194,6 @@ function seekMatchingEventStructure(domain : HTN.Domain, comic : SG.SceneGraph[]
             const states : SG.SceneGraph[] = sol.states;
             states.push(sol.last_state);
 
-            // XXX - what we actually need is the sequence of intermediate states.
             if (SG.matchPanelSequence(comic, states)) {
                 return (events as HTN.Solution);
             }

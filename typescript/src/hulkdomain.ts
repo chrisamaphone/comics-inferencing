@@ -208,3 +208,16 @@ export const init : SG.SceneGraph = [
     hulk_at_epsilon,
     explosion_at_epsilon   
 ]
+
+// Sample hulk comic
+// 1. Explosion at eps, Hulk at eps
+// 2. Hulk falling
+// 3. Hulk falling
+// 4. Hulk falling
+// 5. Hulk landed
+const panel1 = [SG.makeRelation("hulk", Relation.At, "epsilon"), SG.makeRelation("explosion", Relation.At, "epsilon")];
+const panel2 = [SG.makeAttribute("hulk", Attribute.Blasted)];
+const panel3 = [SG.makeAttribute("hulk", Attribute.Falling)];
+const panel4 = [SG.makeAttribute("hulk", Attribute.Falling)];
+const panel5 = [SG.makeAttribute("hulk", Attribute.Landed)];
+export const hulkComic = [panel1, panel2, panel3, panel4, panel5];

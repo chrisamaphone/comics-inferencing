@@ -103,3 +103,9 @@ export function testSeekEventStructure() {
 
     return result;
 }
+
+export function testSeekMatchingEventStructure() {
+    const result = HTNPlanning.seekMatchingEventStructure(Domain.hulkDomain, Domain.hulkComic);
+
+    return result;
+}

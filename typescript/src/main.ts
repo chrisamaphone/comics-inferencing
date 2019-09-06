@@ -5,10 +5,15 @@ console.log("applyTask():");
 HTNUnitTest.testApplyTaskInApplicableState();
 HTNUnitTest.testApplyTaskInNonApplicableState();
 
-console.log("seekPlan(): " + JSON.stringify(HTNUnitTest.testSeekPlan()));
+function runTestPrintResult(s:string, f : () => any) {
+    console.log(s + JSON.stringify(f()));
+}
 
-// currently buggy
-console.log("seeEventStructure(): " + JSON.stringify(HTNUnitTest.testSeekEventStructure()));
+runTestPrintResult("seekPlan(): ", HTNUnitTest.testSeekPlan);
+runTestPrintResult("seeEventStructure(): ", HTNUnitTest.testSeekEventStructure);
+
+// Friday 9/6: Returns null :( -- CRM
+runTestPrintResult("seekMatchingEventStructure(): ", HTNUnitTest.testSeekMatchingEventStructure);
 
 const mydiv = document.getElementById("main");
 mydiv!.innerHTML = "Hello, world!";
