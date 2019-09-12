@@ -49,7 +49,7 @@ const op_fall : HTN.OperatorDefinition =
         }
     }
 
-
+// fall':
 // falling(agent) -o falling(agent)
 const op_fall_prime : HTN.OperatorDefinition =
     function(args:string[]) {
@@ -65,7 +65,7 @@ const op_fall_prime : HTN.OperatorDefinition =
         }
     }
 
-
+// land:
 // falling(agent) -o landed(agent)
 const op_land : HTN.OperatorDefinition =
     function(args:string[]) {

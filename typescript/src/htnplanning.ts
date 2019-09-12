@@ -102,7 +102,7 @@ export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, pr
         const operator : HTN.OperatorDefinition = domain.operators(problem.operator_name) as HTN.OperatorDefinition;
         const newState : SG.SceneGraph | null = applyTask(operator, problem.args, state);
 
-        // If the application of operator was successful, this task it itself the solution.
+        // If the application of operator was successful, this task is itself the solution.
         if(newState) {
             return {sol: problem, states: [state], last_state: newState}
         }
@@ -208,6 +208,67 @@ export function seekMatchingEventStructure(domain : HTN.Domain, comic : SG.Scene
         }
     }
     
+    return null;
+}
+
+// This returns a two dimensional array of HTN tasks.
+// The length of the array is given by the length of the scene graph array: we can have as many tasks as
+// we have scene graphs.  In each array index i is an array of all possible tasks that can establish the
+// state of SceneGraph array index i.
+export function findPossibleSceneGraphComicTasks(domain: HTN.Domain, comic: SG.SceneGraph[]) : HTN.Task[][] | null {
+
+    // For each SceneGraph:
+    for(let sceneGraphIndex = 0; sceneGraphIndex < comic.length; sceneGraphIndex++)
+    {
+        const comicSceneGraph : SG.SceneGraph = comic[sceneGraphIndex];
+
+        // Go through all possible ground tasks of the domain.
+        for(let i = 0; i < domain.groundTasks.length; i++)
+        {
+            // Can this ground task's effects provide the conditions listed in the scene graph?
+            const groundTask : HTN.Task = domain.groundTasks[i];
+            const groundTaskOp : HTN.OperatorDefinition = domain.operators(groundTask.operator_name) as HTN.OperatorDefinition;
+            const {preconds, effects} = groundTaskOp(groundTask.args);
+
+            // Hmm...this is not that simple.  It's not just whether the action can establish
+            // the effects, but rather, it's if the action after applied to current state
+            // can establish the effects.  Bleeeeerg.
+            if(SG.holds(comicSceneGraph, effects))
+            {
+
+            }
+            
+
+            
+
+            
+            
+
+
+
+
+
+
+        }
+    }
+
+
+
+
+    return null;
+}
+
+
+
+
+// TODO
+// This produces a collection of HTNs, each one which "satisfies" the input comic (given as an array of SceneGraphs)
+// Open Q: What does it mean for an HTN to "satisfy" a SceneGraph array?
+// Tentative A: What it means for this function is that the HTN's root node can decompose into a tree structure
+//      where the leaves are *exactly* the input SceneGraph array.  This need not be the case; it could also be
+//      (for example) that the leaves are a superset of the input array, but which contain the input scenegraphs
+//      in the same partial order. Maybe this is worth discussing?
+export function parseSceneGraphComicAsHTN(domain: HTN.Domain, comic: SG.SceneGraph[]) : HTN.Solution[] | null {
     return null;
 }
 
