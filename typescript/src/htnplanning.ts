@@ -121,8 +121,9 @@ export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, pr
             let child_sols = []
             let child_states : SG.SceneGraph[] = []
             let last_state = state;
+            let methodWorks : Boolean = true;
 
-            for(let i=0; i < subtasks.length; i++) {
+            for(let i=0; i < subtasks.length; i++) { // All subtasks of a method must succeed.
                 const child_sol_and_states : Solution | null = seekEventStructure(domain, last_state, subtasks[i]);
                 if(child_sol_and_states) {
                     const child_sol = child_sol_and_states.sol;
@@ -130,25 +131,29 @@ export function seekEventStructure(domain : HTN.Domain, state: SG.SceneGraph, pr
                     last_state = child_sol_and_states.last_state;
                     child_sols.push(child_sol);
                     child_states.concat(states);
-                } else { // No solution for a child
-                    return null;
+                } else { // No solution for a child -- the method fails.
+                    methodWorks = false;
+                    break;
                 }
             }
 
-            const new_sol : HTN.SolutionNode =
-            {
-                action_type: method.name,
-                children: child_sols
-            }
+            if (methodWorks) { // Build the new node and return it
+                const new_sol : HTN.SolutionNode =
+                {
+                    action_type: method.name,
+                    children: child_sols
+                }
 
-            const new_node : Solution =
-            {
-                sol: new_sol,
-                states: child_states,
-                last_state: last_state
-            }
+                const new_node : Solution =
+                {
+                    sol: new_sol,
+                    states: child_states,
+                    last_state: last_state
+                }
 
-            return new_node;
+                return new_node;
+            }
+            // Otherwise, keep searching through possible methods.
         }        
     }
 
